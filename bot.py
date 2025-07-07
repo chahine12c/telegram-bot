@@ -174,8 +174,12 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text(caption.strip())
 
-# 🚀 تشغيل البوت
-app = ApplicationBuilder().token(BOT_TOKEN).build()
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
-print("✅ البوت شغال مع retry واستقرار جيد")
-app.run_polling()
+# ✅ طريقة التشغيل المتوافقة مع python-telegram-bot v20.7
+async def main():
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
+    print("✅ البوت شغال مع retry واستقرار جيد")
+    await app.run_polling()
+
+if __name__ == "__main__":
+    asyncio.run(main())
