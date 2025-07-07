@@ -174,7 +174,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text(caption.strip())
 
-# ✅ طريقة التشغيل المتوافقة مع python-telegram-bot v20.7
+# ✅ تشغيل البوت بالطريقة الصحيحة
 async def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
