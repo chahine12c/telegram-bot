@@ -1,6 +1,8 @@
-buildCommand: ./build.sh
-startCommand: python bot.py
-
-build:
-  environment:
-    python: 3.10.13
+services:
+  - type: worker
+    name: telegram-bot
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    runtime: python-3.10
