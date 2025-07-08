@@ -1,8 +1,5 @@
 services:
   - type: worker
     name: telegram-bot
-    env: python
+    env: docker
     plan: free
-    buildCommand: ./build.sh
-    startCommand: python bot.py
-    runtime: python-3.10.13
