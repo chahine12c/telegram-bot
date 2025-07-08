@@ -5,4 +5,4 @@ services:
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: python bot.py
-    runtime: python-3.10
+    runtime: python-3.10.13
