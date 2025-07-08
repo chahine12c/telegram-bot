@@ -39,18 +39,21 @@ def extract_product_id(url: str):
         return qs["productIds"][0].split(",")[0]
     return None
 
-def get_title_image(product_id):
+def get_title_image_price(product_id):
     try:
         url = f"https://www.aliexpress.com/item/{product_id}.html"
         res = requests.get(url, headers=HEADERS, timeout=10)
         html = res.text
-        title_match = re.search(r'<meta property="og:title" content="([^"]+)"', html)
-        image_match = re.search(r'<meta property="og:image" content="([^"]+)"', html)
+        title_match = re.search(r'<meta property="og:title" content="([^"]+)">', html)
+        image_match = re.search(r'<meta property="og:image" content="([^"]+)">', html)
+        price_match = re.search(r'"price":\{"value":"(\d+\.\d+)"', html)
+
         title = title_match.group(1) if title_match else "❌ ما قدرناش نجيبو عنوان المنتج."
         image = image_match.group(1) if image_match else None
-        return title, image
+        price = price_match.group(1) + " $" if price_match else "❌ السعر غير متوفر"
+        return title, image, price
     except:
-        return "❌ ما قدرناش نجيبو عنوان المنتج.", None
+        return "❌ ما قدرناش نجيبو عنوان المنتج.", None, "❌ السعر غير متوفر"
 
 def generate_affiliate_link(url):
     try:
@@ -98,7 +101,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await waiting.edit_text("❌ ما قدرناش نستخرجو ID المنتج.")
         return
 
-    title, image = get_title_image(product_id)
+    title, image, price = get_title_image_price(product_id)
 
     urls = {
         "💸 رابط العملات المباشر": f"https://vi.aliexpress.com/item/{product_id}.html?sourceType=620&channel=coin",
@@ -109,7 +112,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "⚡ رابط العرض المحدود": f"https://vi.aliexpress.com/item/{product_id}.html?sourceType=561"
     }
 
-    caption = f"🏷️ {title}\n\n"
+    caption = f"🏷️ {title}\n💵 السعر: {price}\n\n"
     for label, url in urls.items():
         link = generate_affiliate_link(url)
         if link and len(caption + f"{label}:\n{link}\n\n") < 1000:
@@ -124,5 +127,5 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # تشغيل البوت
 app = ApplicationBuilder().token(BOT_TOKEN).build()
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
-print("✅ البوت شغال بنجاح على Render")
+print("✅ البوت شغال على Render ويجيب العنوان والسعر والصورة")
 app.run_polling()
