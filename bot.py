@@ -9,6 +9,7 @@ import socket
 from urllib.parse import urlparse, parse_qs, unquote
 import requests
 
+# معلوماتك
 BOT_TOKEN = "7754314760:AAGQo3ieE17vOibQUqcKmgTxIxuVYbYLKmw"
 APP_KEY = "509038"
 APP_SECRET = "gbDEssB1M3LYH8abuIQB57sQDrO47hln"
@@ -61,8 +62,7 @@ async def generate_affiliate_link(url, session):
 async def get_title_from_item(product_id):
     async def inner():
         url = f"https://www.aliexpress.com/item/{product_id}.html"
-        connector = aiohttp.TCPConnector(family=socket.AF_INET, limit=6)
-        async with aiohttp.ClientSession(headers=headers, connector=connector) as session:
+        async with aiohttp.ClientSession(headers=headers) as session:
             async with session.get(url, timeout=5) as resp:
                 html = await resp.text()
                 match = re.search(r'<meta property="og:title" content="([^"]+)"', html)
@@ -74,8 +74,7 @@ async def get_title_from_item(product_id):
 async def get_image_from_item(product_id):
     async def inner():
         url = f"https://www.aliexpress.com/item/{product_id}.html"
-        connector = aiohttp.TCPConnector(family=socket.AF_INET, limit=6)
-        async with aiohttp.ClientSession(headers=headers, connector=connector) as session:
+        async with aiohttp.ClientSession(headers=headers) as session:
             async with session.get(url, timeout=5) as resp:
                 html = await resp.text()
                 match = re.search(r'<meta property="og:image" content="([^"]+)"', html)
@@ -129,8 +128,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await waiting_message.edit_text("❌ ما قدرناش نستخرجو ID المنتج.")
         return
 
-    connector = aiohttp.TCPConnector(family=socket.AF_INET, limit=6)
-    async with aiohttp.ClientSession(headers=headers, connector=connector) as session:
+    async with aiohttp.ClientSession(headers=headers) as session:
         title, image_url = await asyncio.gather(
             get_title_from_item(product_id),
             get_image_from_item(product_id)
@@ -166,5 +164,8 @@ async def main():
     print("✅ البوت شغال بنجاح على Render 🚀")
     await app.run_polling()
 
+# ✅ تشغيل متوافق مع Render (حل نهائي لمشكلة event loop)
 if __name__ == "__main__":
+    import nest_asyncio
+    nest_asyncio.apply()
     asyncio.run(main())
