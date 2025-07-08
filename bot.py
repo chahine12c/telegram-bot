@@ -9,7 +9,7 @@ import socket
 from urllib.parse import urlparse, parse_qs, unquote
 import requests
 
-BOT_TOKEN = "7754314760:AAGQo3ieE17vOibQUqcKmgTxIxuVYbYLKmw"
+BOT_TOKEN = "توكن_تاعك"
 APP_KEY = "509038"
 APP_SECRET = "gbDEssB1M3LYH8abuIQB57sQDrO47hln"
 TRACKING_ID = "default"
@@ -62,9 +62,7 @@ async def get_title_from_item(product_id):
     async def inner():
         url = f"https://www.aliexpress.com/item/{product_id}.html"
         resolver = aiohttp.AsyncResolver(nameservers=["8.8.8.8", "1.1.1.1"])
-        connector = aiohttp.TCPConnector(
-            resolver=resolver, family=socket.AF_INET, limit=6, enable_cleanup_closed=True
-        )
+        connector = aiohttp.TCPConnector(resolver=resolver, family=socket.AF_INET, limit=6)
         async with aiohttp.ClientSession(headers=headers, connector=connector) as session:
             async with session.get(url, timeout=5) as resp:
                 html = await resp.text()
@@ -78,9 +76,7 @@ async def get_image_from_item(product_id):
     async def inner():
         url = f"https://www.aliexpress.com/item/{product_id}.html"
         resolver = aiohttp.AsyncResolver(nameservers=["8.8.8.8", "1.1.1.1"])
-        connector = aiohttp.TCPConnector(
-            resolver=resolver, family=socket.AF_INET, limit=6, enable_cleanup_closed=True
-        )
+        connector = aiohttp.TCPConnector(resolver=resolver, family=socket.AF_INET, limit=6)
         async with aiohttp.ClientSession(headers=headers, connector=connector) as session:
             async with session.get(url, timeout=5) as resp:
                 html = await resp.text()
@@ -135,13 +131,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await waiting_message.edit_text("❌ ما قدرناش نستخرجو ID المنتج.")
         return
 
-    connector = aiohttp.TCPConnector(
-        resolver=aiohttp.AsyncResolver(nameservers=["8.8.8.8", "1.1.1.1"]),
-        family=socket.AF_INET,
-        limit=6,
-        enable_cleanup_closed=True
-    )
-
+    connector = aiohttp.TCPConnector(resolver=aiohttp.AsyncResolver(nameservers=["8.8.8.8", "1.1.1.1"]), family=socket.AF_INET, limit=6)
     async with aiohttp.ClientSession(headers=headers, connector=connector) as session:
         title, image_url = await asyncio.gather(
             get_title_from_item(product_id),
@@ -172,13 +162,13 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text(caption.strip())
 
-async def main():
+### هنا التغيير المهم:
+def start_bot():
+    loop = asyncio.get_event_loop()
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
-    print("✅ البوت شغال مع retry واستقرار جيد")
-    await app.run_polling()
+    print("✅ البوت شغال مع استقرار تام")
+    loop.run_until_complete(app.run_polling())
 
 if __name__ == "__main__":
-    import asyncio
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    start_bot()
