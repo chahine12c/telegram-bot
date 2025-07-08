@@ -61,8 +61,7 @@ async def generate_affiliate_link(url, session):
 async def get_title_from_item(product_id):
     async def inner():
         url = f"https://www.aliexpress.com/item/{product_id}.html"
-        resolver = aiohttp.AsyncResolver(nameservers=["8.8.8.8", "1.1.1.1"])
-        connector = aiohttp.TCPConnector(resolver=resolver, family=socket.AF_INET, limit=6)
+        connector = aiohttp.TCPConnector(family=socket.AF_INET, limit=6)
         async with aiohttp.ClientSession(headers=headers, connector=connector) as session:
             async with session.get(url, timeout=5) as resp:
                 html = await resp.text()
@@ -75,8 +74,7 @@ async def get_title_from_item(product_id):
 async def get_image_from_item(product_id):
     async def inner():
         url = f"https://www.aliexpress.com/item/{product_id}.html"
-        resolver = aiohttp.AsyncResolver(nameservers=["8.8.8.8", "1.1.1.1"])
-        connector = aiohttp.TCPConnector(resolver=resolver, family=socket.AF_INET, limit=6)
+        connector = aiohttp.TCPConnector(family=socket.AF_INET, limit=6)
         async with aiohttp.ClientSession(headers=headers, connector=connector) as session:
             async with session.get(url, timeout=5) as resp:
                 html = await resp.text()
@@ -131,7 +129,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await waiting_message.edit_text("❌ ما قدرناش نستخرجو ID المنتج.")
         return
 
-    connector = aiohttp.TCPConnector(resolver=aiohttp.AsyncResolver(nameservers=["8.8.8.8", "1.1.1.1"]), family=socket.AF_INET, limit=6)
+    connector = aiohttp.TCPConnector(family=socket.AF_INET, limit=6)
     async with aiohttp.ClientSession(headers=headers, connector=connector) as session:
         title, image_url = await asyncio.gather(
             get_title_from_item(product_id),
@@ -162,13 +160,11 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text(caption.strip())
 
-### هنا التغيير المهم:
-def start_bot():
-    loop = asyncio.get_event_loop()
+async def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
-    print("✅ البوت شغال مع استقرار تام")
-    loop.run_until_complete(app.run_polling())
+    print("✅ البوت شغال بنجاح على Render 🚀")
+    await app.run_polling()
 
 if __name__ == "__main__":
-    start_bot()
+    asyncio.run(main())
