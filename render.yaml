@@ -1,3 +1,6 @@
+buildCommand: ./build.sh
+startCommand: python bot.py
+
 build:
   environment:
     python: 3.10.13
