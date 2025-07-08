@@ -9,7 +9,7 @@ import socket
 from urllib.parse import urlparse, parse_qs, unquote
 import requests
 
-BOT_TOKEN = "توكن_تاعك"
+BOT_TOKEN = "7754314760:AAGQo3ieE17vOibQUqcKmgTxIxuVYbYLKmw"
 APP_KEY = "509038"
 APP_SECRET = "gbDEssB1M3LYH8abuIQB57sQDrO47hln"
 TRACKING_ID = "default"
