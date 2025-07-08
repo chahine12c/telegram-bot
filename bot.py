@@ -67,7 +67,6 @@ async def get_title_from_item(product_id):
         )
         async with aiohttp.ClientSession(headers=headers, connector=connector) as session:
             async with session.get(url, timeout=5) as resp:
-                print(f"[debug] title status: {resp.status}")
                 html = await resp.text()
                 match = re.search(r'<meta property="og:title" content="([^"]+)"', html)
                 if match:
@@ -84,7 +83,6 @@ async def get_image_from_item(product_id):
         )
         async with aiohttp.ClientSession(headers=headers, connector=connector) as session:
             async with session.get(url, timeout=5) as resp:
-                print(f"[debug] image status: {resp.status}")
                 html = await resp.text()
                 match = re.search(r'<meta property="og:image" content="([^"]+)"', html)
                 if match:
@@ -175,7 +173,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(caption.strip())
 
 async def main():
-    app = ApplicationBuilder().token(BOT_TOKEN).concurrent_updates(True).build()
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
     print("✅ البوت شغال مع retry واستقرار جيد")
     await app.run_polling()
